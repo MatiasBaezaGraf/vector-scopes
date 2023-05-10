@@ -85,6 +85,40 @@ const VideoVectorScope = () => {
 			// Calculate the scaling factor for histogram height
 			const scalingFactor = histogramHeight / maxCount;
 
+			// Draw the outline of the histogram
+			context.strokeStyle = "black";
+			context.beginPath();
+			//Outline
+			context.moveTo(1, 1);
+			context.lineTo(899, 1);
+			context.lineTo(899, 239);
+			context.lineTo(1, 239);
+			context.lineTo(1, 1);
+			//Dividing lines
+			context.moveTo(300, 0);
+			context.lineTo(300, 240);
+			context.moveTo(600, 0);
+			context.lineTo(600, 240);
+			context.stroke();
+
+			//Horizontal lines
+			context.strokeStyle = "grey";
+			context.moveTo(0, 30);
+			context.lineTo(900, 30);
+			context.moveTo(0, 60);
+			context.lineTo(900, 60);
+			context.moveTo(0, 90);
+			context.lineTo(900, 90);
+			context.moveTo(0, 120);
+			context.lineTo(900, 120);
+			context.moveTo(0, 150);
+			context.lineTo(900, 150);
+			context.moveTo(0, 180);
+			context.lineTo(900, 180);
+			context.moveTo(0, 210);
+			context.lineTo(900, 210);
+			context.stroke();
+
 			// Plot the histogram
 			for (let i = 0; i < 256; i = i + 1) {
 				const x = i;
@@ -93,22 +127,23 @@ const VideoVectorScope = () => {
 				const blueHeight = distribution.blue[i] * scalingFactor;
 
 				// Draw the vertical lines for each channel
+
 				context.strokeStyle = "red";
 				context.beginPath();
-				context.moveTo(x * 3, histogramHeight);
-				context.lineTo(x * 3, histogramHeight - redHeight);
+				context.moveTo(x, histogramHeight);
+				context.lineTo(x, histogramHeight - redHeight);
 				context.stroke();
 
 				context.strokeStyle = "green";
 				context.beginPath();
-				context.moveTo(x * 3, histogramHeight);
-				context.lineTo(x * 3, histogramHeight - greenHeight);
+				context.moveTo(x + 300, histogramHeight);
+				context.lineTo(x + 300, histogramHeight - greenHeight);
 				context.stroke();
 
 				context.strokeStyle = "blue";
 				context.beginPath();
-				context.moveTo(x * 3, histogramHeight);
-				context.lineTo(x * 3, histogramHeight - blueHeight);
+				context.moveTo(x + 600, histogramHeight);
+				context.lineTo(x + 600, histogramHeight - blueHeight);
 				context.stroke();
 			}
 		};
@@ -165,8 +200,8 @@ const VideoVectorScope = () => {
 			<canvas
 				className="p-[20px]"
 				id="histogramCanvas"
-				width={800}
-				height={450}
+				width={900}
+				height={240}
 			/>
 			{/* <canvas id="vectorScopeCanvas" width={800} height={450} /> */}
 		</div>
