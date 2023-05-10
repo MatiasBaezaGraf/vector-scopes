@@ -9,37 +9,15 @@ const VideoVectorScope = () => {
 		const imageElement = imageRef.current;
 
 		const captureFrame = () => {
-			const canvas = document.getElementById("videoCanvas");
+			const canvas = document.getElementById("photoCanvas");
 			const context = canvas.getContext("2d");
 
 			// Draw the current video frame onto the canvas
-			context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+			context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
 
 			// Get the pixel data of the current frame
 			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 			const pixels = imageData.data;
-
-			// Calculate the average color for each pixel
-			const vectors = [];
-			for (let i = 0; i < pixels.length; i += 4) {
-				const red = pixels[i];
-				const green = pixels[i + 1];
-				const blue = pixels[i + 2];
-
-				// Calculate the average value (brightness) of the pixel
-				const brightness = (red + green + blue) / 3;
-
-				// Convert the pixel color to polar coordinates (radius, angle)
-				const radius = brightness;
-				const angle = Math.atan2(green - blue, red - brightness);
-
-				// Add the vector to the vectors array
-				vectors.push({ radius, angle });
-			}
-
-			// Render the vectorscope
-			//-------------------------------------------------------------------------------------------------
-			// renderVectorScope(vectors);
 
 			// Render the RGB histogram
 			//-------------------------------------------------------------------------------------------------
@@ -109,48 +87,66 @@ const VideoVectorScope = () => {
 			}
 
 			// Find the maximum count in the distribution for scaling
-			const maxCount = Math.max(
-				Math.max(...distribution.red),
-				Math.max(...distribution.green),
-				Math.max(...distribution.blue),
-				Math.max(...distribution.grayscale)
-			);
+			const redMaxCount = Math.max(...distribution.red);
+			const greenMaxCount = Math.max(...distribution.green);
+			const blueMaxCount = Math.max(...distribution.blue);
+			const grayscaleMaxCount = Math.max(...distribution.grayscale);
 
 			// Calculate the scaling factor for histogram height
-			const scalingFactor = histogramHeight / maxCount;
+			const redScalingFactor = histogramHeight / redMaxCount;
+			const greenScalingFactor = histogramHeight / greenMaxCount;
+			const blueScalingFactor = histogramHeight / blueMaxCount;
+			const grayscaleScalingFactor = histogramHeight / grayscaleMaxCount;
 
 			// Plot the histogram
-			for (let i = 0; i < 300; i = i + 2) {
+			for (let i = 0; i < 256; i = i + 1) {
 				const x = i;
-				const redHeight = distribution.red[i] * scalingFactor;
-				const greenHeight = distribution.green[i] * scalingFactor;
-				const blueHeight = distribution.blue[i] * scalingFactor;
-				const grayscaleHeight = distribution.grayscale[i] * scalingFactor;
+
+				const redHeight = distribution.red[i] * redScalingFactor;
+				const greenHeight = distribution.green[i] * greenScalingFactor;
+				const blueHeight = distribution.blue[i] * blueScalingFactor;
+				const grayscaleHeight =
+					distribution.grayscale[i] * grayscaleScalingFactor;
+
+				// Calculate the height of the next bar in the histogram
+				// This is used to draw the line from the current bar to the next bar
+				const nextRedHeight = distribution.red[i + 1] * redScalingFactor;
+				const nextGreenHeight = distribution.green[i + 1] * greenScalingFactor;
+				const nextBlueHeight = distribution.blue[i + 1] * blueScalingFactor;
+				const nextGrayscaleHeight =
+					distribution.grayscale[i + 1] * grayscaleScalingFactor;
 
 				// Draw the vertical lines for each channel
 
 				contextRed.strokeStyle = "red";
 				contextRed.beginPath();
-				contextRed.moveTo(x, histogramHeight);
-				contextRed.lineTo(x, histogramHeight - redHeight);
+				contextRed.moveTo(x * 2, histogramHeight);
+				contextRed.lineTo(x * 2, histogramHeight - redHeight);
+				contextRed.lineTo((x + 1) * 2, histogramHeight - nextRedHeight);
 				contextRed.stroke();
 
 				contextGreen.strokeStyle = "green";
 				contextGreen.beginPath();
-				contextGreen.moveTo(x, histogramHeight);
-				contextGreen.lineTo(x, histogramHeight - greenHeight);
+				contextGreen.moveTo(x * 2, histogramHeight);
+				contextGreen.lineTo(x * 2, histogramHeight - greenHeight);
+				contextGreen.lineTo((x + 1) * 2, histogramHeight - nextGreenHeight);
 				contextGreen.stroke();
 
 				contextBlue.strokeStyle = "blue";
 				contextBlue.beginPath();
-				contextBlue.moveTo(x, histogramHeight);
-				contextBlue.lineTo(x, histogramHeight - blueHeight);
+				contextBlue.moveTo(x * 2, histogramHeight);
+				contextBlue.lineTo(x * 2, histogramHeight - blueHeight);
+				contextBlue.lineTo((x + 1) * 2, histogramHeight - nextBlueHeight);
 				contextBlue.stroke();
 
 				contextGrayscale.strokeStyle = "white";
 				contextGrayscale.beginPath();
-				contextGrayscale.moveTo(x, histogramHeight);
-				contextGrayscale.lineTo(x, histogramHeight - grayscaleHeight);
+				contextGrayscale.moveTo(x * 2, histogramHeight);
+				contextGrayscale.lineTo(x * 2, histogramHeight - grayscaleHeight);
+				contextGrayscale.lineTo(
+					(x + 1) * 2,
+					histogramHeight - nextGrayscaleHeight
+				);
 				contextGrayscale.stroke();
 			}
 		};
@@ -265,9 +261,9 @@ const VideoVectorScope = () => {
 			// Calculate the width of each waveform sample
 			const sampleWidth = canvas.width / pixels.length;
 
-			// Plot the waveform
-			context.beginPath();
-			context.moveTo(0, waveformHeight / 2);
+			// // Plot the waveform
+			// context.beginPath();
+			// context.moveTo(0, waveformHeight / 2);
 
 			for (let i = 0; i < pixels.length; i += 4) {
 				const red = pixels[i];
@@ -280,16 +276,59 @@ const VideoVectorScope = () => {
 				// Calculate the vertical position for the waveform sample
 				const y = waveformHeight - (brightness * waveformHeight) / 255;
 
-				// Draw a line to the next waveform sample
-				context.lineTo(i * sampleWidth, y);
+				context.beginPath();
+				context.moveTo(i * sampleWidth, y);
+				context.lineTo(i * sampleWidth, y + 0.15);
+				context.stroke();
+				context.strokeStyle = "green";
+
+				// // Draw a line to the next waveform sample
+				// context.lineTo(i * sampleWidth, y);
 			}
 
-			// Set the waveform line color
-			context.strokeStyle = "green";
+			// // Set the waveform line color
+			// context.strokeStyle = "green";
 
-			// Draw the waveform
-			context.stroke();
+			// // Draw the waveform
+			// context.stroke();
 		};
+
+		// const renderWaveform = (pixels) => {
+		// 	const canvas = document.getElementById("waveFormCanvas");
+		// 	const context = canvas.getContext("2d");
+		// 	const waveformHeight = canvas.height;
+
+		// 	// Clear the canvas
+		// 	context.clearRect(0, 0, canvas.width, canvas.height);
+
+		// 	// Calculate the height of each waveform sample
+		// 	const sampleWidth = canvas.width / pixels.length;
+
+		// 	// Plot the waveform
+		// 	context.beginPath();
+		// 	context.moveTo(0, waveformHeight / 2);
+
+		// 	for (let i = 0; i < pixels.length; i += 4) {
+		// 		const red = pixels[i];
+		// 		const green = pixels[i + 1];
+		// 		const blue = pixels[i + 2];
+
+		// 		// Calculate the average value (brightness) of the pixel
+		// 		const brightness = (red + green + blue) / 3;
+
+		// 		// Calculate the vertical position for the waveform sample
+		// 		const y = waveformHeight - (brightness * waveformHeight) / 255;
+
+		// 		// Draw a line to the next waveform sample
+		// 		context.lineTo(i * sampleWidth, y);
+		// 	}
+
+		// 	// Set the waveform line color
+		// 	context.strokeStyle = "green";
+
+		// 	// Draw the waveform
+		// 	context.stroke();
+		// };
 
 		// Start capturing frames
 		captureFrame();
@@ -302,42 +341,44 @@ const VideoVectorScope = () => {
 	return (
 		<div className="flex flex-col items-center">
 			<div className="flex flex-row items-center">
-				{/* <img
+				{/* Comment out the video tag and uncomment the image tag to see the
+				histogram and waveform for the image instead of the video and viceversa*/}
+				<img
 					className="p-[20px] h-min"
 					ref={imageRef}
-					src="green.png"
+					src="gato.png"
 					alt="colors"
-				/> */}
-				<video
+				/>
+				{/* <video
 					className="p-[20px] h-min"
 					ref={videoRef}
 					src="colores.mp4"
 					controls
-				/>
+				/> */}
 				<div className="flex flex-col justify-center">
 					<canvas
 						className="m-[10px] bg-stone-300 border-[1px] border-stone-500"
 						id="grayscale"
-						width={256}
-						height={100}
+						width={512}
+						height={130}
 					/>
 					<canvas
 						className="m-[10px] bg-stone-300 border-[1px] border-stone-500"
 						id="red"
-						width={256}
-						height={100}
+						width={512}
+						height={130}
 					/>
 					<canvas
 						className="m-[10px] bg-stone-300 border-[1px] border-stone-500"
 						id="green"
-						width={256}
-						height={100}
+						width={512}
+						height={130}
 					/>
 					<canvas
 						className="m-[10px] bg-stone-300 border-[1px] border-stone-500"
 						id="blue"
-						width={256}
-						height={100}
+						width={512}
+						height={130}
 					/>
 				</div>
 			</div>
@@ -354,10 +395,10 @@ const VideoVectorScope = () => {
 				height={450}
 			/>
 			<canvas
-				className="m-[20px] bg-stone-800"
+				className="m-[20px] bg-black"
 				id="waveFormCanvas"
-				width={900}
-				height={300}
+				width={600}
+				height={600}
 			/>
 			{/* <canvas
 				className="p-[20px]"
