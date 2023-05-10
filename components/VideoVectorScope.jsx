@@ -37,7 +37,7 @@ const VideoVectorScope = () => {
 
 			// Render the vectorscope
 			//-------------------------------------------------------------------------------------------------
-			//renderVectorScope(vectors);
+			renderVectorScope(vectors);
 
 			// Render the RGB histogram
 			//-------------------------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ const VideoVectorScope = () => {
 				width={800}
 				height={450}
 			/>
-			{/* <canvas id="vectorScopeCanvas" width={800} height={450} /> */}
+			<canvas id="vectorScopeCanvas" width={800} height={450} />
 		</div>
 	);
 };
