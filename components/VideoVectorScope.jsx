@@ -7,7 +7,7 @@ const VideoVectorScope = () => {
 		const videoElement = videoRef.current;
 
 		const captureFrame = () => {
-			const canvas = document.getElementById("vectorScopeCanvas");
+			const canvas = document.getElementById("videoCanvas");
 			const context = canvas.getContext("2d");
 
 			// Draw the current video frame onto the canvas
@@ -46,6 +46,10 @@ const VideoVectorScope = () => {
 			// Render the RGB histogram
 			//-------------------------------------------------------------------------------------------------
 			renderMultiRGBHistogram(pixels);
+
+			// Render the Waveform
+			//-------------------------------------------------------------------------------------------------
+			renderWaveform(pixels);
 
 			// Perform frame processing and vector scope calculations here
 
@@ -248,6 +252,43 @@ const VideoVectorScope = () => {
 			}
 		};
 
+		const renderWaveform = (pixels) => {
+			const canvas = document.getElementById("waveFormCanvas");
+			const context = canvas.getContext("2d");
+			const waveformHeight = canvas.height;
+
+			// Clear the canvas
+			context.clearRect(0, 0, canvas.width, canvas.height);
+
+			// Calculate the width of each waveform sample
+			const sampleWidth = canvas.width / pixels.length;
+
+			// Plot the waveform
+			context.beginPath();
+			context.moveTo(0, waveformHeight / 2);
+
+			for (let i = 0; i < pixels.length; i += 4) {
+				const red = pixels[i];
+				const green = pixels[i + 1];
+				const blue = pixels[i + 2];
+
+				// Calculate the average value (brightness) of the pixel
+				const brightness = (red + green + blue) / 3;
+
+				// Calculate the vertical position for the waveform sample
+				const y = waveformHeight - (brightness * waveformHeight) / 255;
+
+				// Draw a line to the next waveform sample
+				context.lineTo(i * sampleWidth, y);
+			}
+
+			// Set the waveform line color
+			context.strokeStyle = "green";
+
+			// Draw the waveform
+			context.stroke();
+		};
+
 		// Start capturing frames
 		captureFrame();
 
@@ -294,9 +335,15 @@ const VideoVectorScope = () => {
 			</div>
 			<canvas
 				className="p-[20px] hidden"
-				id="vectorScopeCanvas"
+				id="videoCanvas"
 				width={800}
 				height={450}
+			/>
+			<canvas
+				className="m-[20px] bg-stone-800"
+				id="waveFormCanvas"
+				width={900}
+				height={300}
 			/>
 			{/* <canvas
 				className="p-[20px]"
