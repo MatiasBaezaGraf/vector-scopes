@@ -41,12 +41,112 @@ const VideoVectorScope = () => {
 
 			// Render the RGB histogram
 			//-------------------------------------------------------------------------------------------------
-			renderRGBHistogram(pixels);
+			// renderRGBHistogram(pixels);
+
+			// Render the RGB histogram
+			//-------------------------------------------------------------------------------------------------
+			renderMultiRGBHistogram(pixels);
 
 			// Perform frame processing and vector scope calculations here
 
 			// Request the next frame
 			requestAnimationFrame(captureFrame);
+		};
+
+		const renderMultiRGBHistogram = (pixels) => {
+			const canvasGrayscale = document.getElementById("grayscale");
+			const contextGrayscale = canvasGrayscale.getContext("2d");
+
+			const canvasRed = document.getElementById("red");
+			const contextRed = canvasRed.getContext("2d");
+
+			const canvasGreen = document.getElementById("green");
+			const contextGreen = canvasGreen.getContext("2d");
+
+			const canvasBlue = document.getElementById("blue");
+			const contextBlue = canvasBlue.getContext("2d");
+
+			const histogramHeight = canvasRed.height;
+
+			// Clear the canvas
+			contextRed.clearRect(0, 0, canvasRed.width, canvasRed.height);
+			contextGreen.clearRect(0, 0, canvasGreen.width, canvasGreen.height);
+			contextBlue.clearRect(0, 0, canvasBlue.width, canvasBlue.height);
+			contextGrayscale.clearRect(
+				0,
+				0,
+				canvasGrayscale.width,
+				canvasGrayscale.height
+			);
+
+			// Calculate color distribution
+			const distribution = {
+				red: new Array(256).fill(0),
+				green: new Array(256).fill(0),
+				blue: new Array(256).fill(0),
+				grayscale: new Array(256).fill(0),
+			};
+
+			for (let i = 0; i < pixels.length; i += 4) {
+				const red = pixels[i];
+				const green = pixels[i + 1];
+				const blue = pixels[i + 2];
+
+				// Calculate the grayscale value for the pixel
+				const grayscale = Math.round((red + green + blue) / 3);
+
+				// Increment the respective channel count in the distribution
+				distribution.red[red]++;
+				distribution.green[green]++;
+				distribution.blue[blue]++;
+				distribution.grayscale[grayscale]++;
+			}
+
+			// Find the maximum count in the distribution for scaling
+			const maxCount = Math.max(
+				Math.max(...distribution.red),
+				Math.max(...distribution.green),
+				Math.max(...distribution.blue),
+				Math.max(...distribution.grayscale)
+			);
+
+			// Calculate the scaling factor for histogram height
+			const scalingFactor = histogramHeight / maxCount;
+
+			// Plot the histogram
+			for (let i = 0; i < 300; i = i + 2) {
+				const x = i;
+				const redHeight = distribution.red[i] * scalingFactor;
+				const greenHeight = distribution.green[i] * scalingFactor;
+				const blueHeight = distribution.blue[i] * scalingFactor;
+				const grayscaleHeight = distribution.grayscale[i] * scalingFactor;
+
+				// Draw the vertical lines for each channel
+
+				contextRed.strokeStyle = "red";
+				contextRed.beginPath();
+				contextRed.moveTo(x, histogramHeight);
+				contextRed.lineTo(x, histogramHeight - redHeight);
+				contextRed.stroke();
+
+				contextGreen.strokeStyle = "green";
+				contextGreen.beginPath();
+				contextGreen.moveTo(x, histogramHeight);
+				contextGreen.lineTo(x, histogramHeight - greenHeight);
+				contextGreen.stroke();
+
+				contextBlue.strokeStyle = "blue";
+				contextBlue.beginPath();
+				contextBlue.moveTo(x, histogramHeight);
+				contextBlue.lineTo(x, histogramHeight - blueHeight);
+				contextBlue.stroke();
+
+				contextGrayscale.strokeStyle = "white";
+				contextGrayscale.beginPath();
+				contextGrayscale.moveTo(x, histogramHeight);
+				contextGrayscale.lineTo(x, histogramHeight - grayscaleHeight);
+				contextGrayscale.stroke();
+			}
 		};
 
 		const renderRGBHistogram = (pixels) => {
@@ -148,38 +248,6 @@ const VideoVectorScope = () => {
 			}
 		};
 
-		const renderVectorScope = (vectors) => {
-			const canvas = document.getElementById("vectorScopeCanvas");
-			const context = canvas.getContext("2d");
-
-			// Clear the canvas
-			context.clearRect(0, 0, canvas.width, canvas.height);
-
-			// Set the center of the vector scope
-			const centerX = canvas.width / 2;
-			const centerY = canvas.height / 2;
-
-			// Draw a line for each vector
-			vectors.forEach((vector) => {
-				const { radius, angle } = vector;
-
-				// Convert the polar coordinates back to Cartesian coordinates
-				const x = centerX + radius * Math.cos(angle);
-				const y = centerY + radius * Math.sin(angle);
-
-				// Set the line color based on the vector angle
-				context.strokeStyle = `hsl(${
-					(angle * 180) / Math.PI + 180
-				}, 100%, 50%)`;
-
-				// Draw the line
-				context.beginPath();
-				context.moveTo(centerX, centerY);
-				context.lineTo(x, y);
-				context.stroke();
-			});
-		};
-
 		// Start capturing frames
 		captureFrame();
 
@@ -190,20 +258,52 @@ const VideoVectorScope = () => {
 
 	return (
 		<div className="flex flex-col items-center">
-			<video className="p-[20px]" ref={videoRef} src="colors.mp4" controls />
+			<div className="flex flex-row items-center">
+				<video
+					className="p-[20px] h-min"
+					ref={videoRef}
+					src="colors.mp4"
+					controls
+				/>
+				<div className="flex flex-col justify-center">
+					<canvas
+						className="m-[10px] bg-stone-300 border-[1px] border-stone-500"
+						id="grayscale"
+						width={256}
+						height={100}
+					/>
+					<canvas
+						className="m-[10px] bg-stone-300 border-[1px] border-stone-500"
+						id="red"
+						width={256}
+						height={100}
+					/>
+					<canvas
+						className="m-[10px] bg-stone-300 border-[1px] border-stone-500"
+						id="green"
+						width={256}
+						height={100}
+					/>
+					<canvas
+						className="m-[10px] bg-stone-300 border-[1px] border-stone-500"
+						id="blue"
+						width={256}
+						height={100}
+					/>
+				</div>
+			</div>
 			<canvas
 				className="p-[20px] hidden"
 				id="vectorScopeCanvas"
 				width={800}
 				height={450}
 			/>
-			<canvas
+			{/* <canvas
 				className="p-[20px]"
 				id="histogramCanvas"
 				width={900}
 				height={240}
-			/>
-			{/* <canvas id="vectorScopeCanvas" width={800} height={450} /> */}
+			/> */}
 		</div>
 	);
 };
