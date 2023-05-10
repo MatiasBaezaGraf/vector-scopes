@@ -120,7 +120,7 @@ const VideoVectorScope = () => {
 			context.stroke();
 
 			// Plot the histogram
-			for (let i = 0; i < 256; i = i + 1) {
+			for (let i = 0; i < 300; i = i + 2) {
 				const x = i;
 				const redHeight = distribution.red[i] * scalingFactor;
 				const greenHeight = distribution.green[i] * scalingFactor;
@@ -130,20 +130,20 @@ const VideoVectorScope = () => {
 
 				context.strokeStyle = "red";
 				context.beginPath();
-				context.moveTo(x, histogramHeight);
-				context.lineTo(x, histogramHeight - redHeight);
+				context.moveTo(x * 1.17, histogramHeight);
+				context.lineTo(x * 1.17, histogramHeight - redHeight);
 				context.stroke();
 
 				context.strokeStyle = "green";
 				context.beginPath();
-				context.moveTo(x + 300, histogramHeight);
-				context.lineTo(x + 300, histogramHeight - greenHeight);
+				context.moveTo(x * 1.17 + 300, histogramHeight);
+				context.lineTo(x * 1.17 + 300, histogramHeight - greenHeight);
 				context.stroke();
 
 				context.strokeStyle = "blue";
 				context.beginPath();
-				context.moveTo(x + 600, histogramHeight);
-				context.lineTo(x + 600, histogramHeight - blueHeight);
+				context.moveTo(x * 1.17 + 600, histogramHeight);
+				context.lineTo(x * 1.17 + 600, histogramHeight - blueHeight);
 				context.stroke();
 			}
 		};
