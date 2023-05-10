@@ -277,7 +277,7 @@ const VideoVectorScope = () => {
 				context.beginPath();
 				context.lineWidth = 1;
 				context.moveTo(i * sampleWidth, y);
-				context.lineTo(i * sampleWidth, y + 0.15);
+				context.lineTo(i * sampleWidth, y + 0.26);
 				context.stroke();
 				context.strokeStyle = "green";
 			}
