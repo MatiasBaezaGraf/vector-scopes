@@ -2,9 +2,11 @@ import React, { useRef, useEffect } from "react";
 
 const VideoVectorScope = () => {
 	const videoRef = useRef(null);
+	const imageRef = useRef(null);
 
 	useEffect(() => {
 		const videoElement = videoRef.current;
+		const imageElement = imageRef.current;
 
 		const captureFrame = () => {
 			const canvas = document.getElementById("videoCanvas");
@@ -300,10 +302,16 @@ const VideoVectorScope = () => {
 	return (
 		<div className="flex flex-col items-center">
 			<div className="flex flex-row items-center">
+				{/* <img
+					className="p-[20px] h-min"
+					ref={imageRef}
+					src="green.png"
+					alt="colors"
+				/> */}
 				<video
 					className="p-[20px] h-min"
 					ref={videoRef}
-					src="colors.mp4"
+					src="colores.mp4"
 					controls
 				/>
 				<div className="flex flex-col justify-center">
@@ -333,6 +341,12 @@ const VideoVectorScope = () => {
 					/>
 				</div>
 			</div>
+			<canvas
+				className="p-[20px] hidden"
+				id="photoCanvas"
+				width={800}
+				height={450}
+			/>
 			<canvas
 				className="p-[20px] hidden"
 				id="videoCanvas"
