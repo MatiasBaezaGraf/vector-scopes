@@ -94,6 +94,7 @@ const VideoVectorScope = () => {
 			};
 
 			for (let i = 0; i < pixels.length; i += 4) {
+				console.log(pixels);
 				const red = pixels[i];
 				const green = pixels[i + 1];
 				const blue = pixels[i + 2];
@@ -107,6 +108,8 @@ const VideoVectorScope = () => {
 				distribution.blue[blue]++;
 				distribution.grayscale[grayscale]++;
 			}
+
+			console.log(distribution);
 
 			// Find the maximum count in the distribution for scaling
 			const maxCount = Math.max(
