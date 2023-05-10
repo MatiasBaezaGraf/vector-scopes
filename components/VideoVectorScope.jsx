@@ -261,36 +261,8 @@ const VideoVectorScope = () => {
 			// Calculate the width of each waveform sample
 			const sampleWidth = canvas.width / pixels.length;
 
-			// Horizontal lines for the waveform
-			// context.strokeStyle = "grey";
-			// context.beginPath();
-			// context.moveTo(0, 0);
-			// context.lineTo(900, 0);
-			// context.moveTo(0, 60);
-			// context.lineTo(900, 60);
-			// context.moveTo(0, 120);
-			// context.lineTo(900, 120);
-			// context.moveTo(0, 180);
-			// context.lineTo(900, 180);
-			// context.moveTo(0, 240);
-			// context.lineTo(900, 240);
-			// context.moveTo(0, 300);
-			// context.lineTo(900, 300);
-			// context.moveTo(0, 360);
-			// context.lineTo(900, 360);
-			// context.moveTo(0, 420);
-			// context.lineTo(900, 420);
-			// context.moveTo(0, 480);
-			// context.lineTo(900, 480);
-			// context.moveTo(0, 540);
-			// context.lineTo(900, 540);
-			// context.moveTo(0, 600);
-			// context.lineTo(900, 600);
-			// context.stroke();
-
 			// Plot the waveform
-
-			for (let i = 0; i < pixels.length; i += 4) {
+			for (let i = 0; i < pixels.length; i += 8) {
 				const red = pixels[i];
 				const green = pixels[i + 1];
 				const blue = pixels[i + 2];
