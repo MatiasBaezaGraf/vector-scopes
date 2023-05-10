@@ -9,11 +9,11 @@ const VideoVectorScope = () => {
 		const imageElement = imageRef.current;
 
 		const captureFrame = () => {
-			const canvas = document.getElementById("photoCanvas");
+			const canvas = document.getElementById("videoCanvas");
 			const context = canvas.getContext("2d");
 
 			// Draw the current video frame onto the canvas
-			context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+			context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
 
 			// Get the pixel data of the current frame
 			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
@@ -261,9 +261,34 @@ const VideoVectorScope = () => {
 			// Calculate the width of each waveform sample
 			const sampleWidth = canvas.width / pixels.length;
 
-			// // Plot the waveform
+			// Horizontal lines for the waveform
+			// context.strokeStyle = "grey";
 			// context.beginPath();
-			// context.moveTo(0, waveformHeight / 2);
+			// context.moveTo(0, 0);
+			// context.lineTo(900, 0);
+			// context.moveTo(0, 60);
+			// context.lineTo(900, 60);
+			// context.moveTo(0, 120);
+			// context.lineTo(900, 120);
+			// context.moveTo(0, 180);
+			// context.lineTo(900, 180);
+			// context.moveTo(0, 240);
+			// context.lineTo(900, 240);
+			// context.moveTo(0, 300);
+			// context.lineTo(900, 300);
+			// context.moveTo(0, 360);
+			// context.lineTo(900, 360);
+			// context.moveTo(0, 420);
+			// context.lineTo(900, 420);
+			// context.moveTo(0, 480);
+			// context.lineTo(900, 480);
+			// context.moveTo(0, 540);
+			// context.lineTo(900, 540);
+			// context.moveTo(0, 600);
+			// context.lineTo(900, 600);
+			// context.stroke();
+
+			// Plot the waveform
 
 			for (let i = 0; i < pixels.length; i += 4) {
 				const red = pixels[i];
@@ -276,61 +301,16 @@ const VideoVectorScope = () => {
 				// Calculate the vertical position for the waveform sample
 				const y = waveformHeight - (brightness * waveformHeight) / 255;
 
+				// Draw the line for the waveform sample
 				context.beginPath();
+				context.lineWidth = 1;
 				context.moveTo(i * sampleWidth, y);
 				context.lineTo(i * sampleWidth, y + 0.15);
 				context.stroke();
 				context.strokeStyle = "green";
-
-				// // Draw a line to the next waveform sample
-				// context.lineTo(i * sampleWidth, y);
 			}
-
-			// // Set the waveform line color
-			// context.strokeStyle = "green";
-
-			// // Draw the waveform
-			// context.stroke();
 		};
 
-		// const renderWaveform = (pixels) => {
-		// 	const canvas = document.getElementById("waveFormCanvas");
-		// 	const context = canvas.getContext("2d");
-		// 	const waveformHeight = canvas.height;
-
-		// 	// Clear the canvas
-		// 	context.clearRect(0, 0, canvas.width, canvas.height);
-
-		// 	// Calculate the height of each waveform sample
-		// 	const sampleWidth = canvas.width / pixels.length;
-
-		// 	// Plot the waveform
-		// 	context.beginPath();
-		// 	context.moveTo(0, waveformHeight / 2);
-
-		// 	for (let i = 0; i < pixels.length; i += 4) {
-		// 		const red = pixels[i];
-		// 		const green = pixels[i + 1];
-		// 		const blue = pixels[i + 2];
-
-		// 		// Calculate the average value (brightness) of the pixel
-		// 		const brightness = (red + green + blue) / 3;
-
-		// 		// Calculate the vertical position for the waveform sample
-		// 		const y = waveformHeight - (brightness * waveformHeight) / 255;
-
-		// 		// Draw a line to the next waveform sample
-		// 		context.lineTo(i * sampleWidth, y);
-		// 	}
-
-		// 	// Set the waveform line color
-		// 	context.strokeStyle = "green";
-
-		// 	// Draw the waveform
-		// 	context.stroke();
-		// };
-
-		// Start capturing frames
 		captureFrame();
 
 		return () => {
@@ -343,19 +323,19 @@ const VideoVectorScope = () => {
 			<div className="flex flex-row items-center">
 				{/* Comment out the video tag and uncomment the image tag to see the
 				histogram and waveform for the image instead of the video and viceversa*/}
-				<img
+				{/* <img
 					className="p-[20px] h-min"
 					ref={imageRef}
 					src="gato.png"
 					alt="colors"
-				/>
-				{/* <video
+				/> */}
+				<video
 					className="p-[20px] h-min"
 					ref={videoRef}
 					src="colores.mp4"
 					controls
-				/> */}
-				<div className="flex flex-col justify-center">
+				/>
+				<div className=" flex-col justify-center hidden">
 					<canvas
 						className="m-[10px] bg-stone-300 border-[1px] border-stone-500"
 						id="grayscale"
@@ -394,12 +374,26 @@ const VideoVectorScope = () => {
 				width={800}
 				height={450}
 			/>
-			<canvas
-				className="m-[20px] bg-black"
-				id="waveFormCanvas"
-				width={600}
-				height={600}
-			/>
+			<div className="relative">
+				<div className="absolute h-full w-full z-30 py-[20px] flex flex-col justify-between">
+					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
+					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
+					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
+					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
+					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
+					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
+					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
+					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
+					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
+					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
+				</div>
+				<canvas
+					className="m-[20px] py-[20px] bg-black"
+					id="waveFormCanvas"
+					width={600}
+					height={600}
+				/>
+			</div>
 			{/* <canvas
 				className="p-[20px]"
 				id="histogramCanvas"
