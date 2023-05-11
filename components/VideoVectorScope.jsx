@@ -14,11 +14,22 @@ const VideoVectorScope = () => {
 
 			// Draw the current video frame onto the canvas
 			context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-
 			// Get the pixel data of the current frame
 			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 			const pixels = imageData.data;
 
+			//row 50, column 200, 0 red, 1 green, 2 blue, 3 alpha
+			console.log("red", pixels[100 * (imageData.width * 4) + 600 * 4 + 0]);
+			console.log("green", pixels[100 * (imageData.width * 4) + 600 * 4 + 1]);
+			console.log("blue", pixels[100 * (imageData.width * 4) + 600 * 4 + 2]);
+
+			// console.log(
+			// 	"brightness",
+			// 	(pixels[2 * (imageData.width * 4) + 100 * 4 + 0] +
+			// 		pixels[2 * (imageData.width * 4) + 100 * 4 + 1] +
+			// 		pixels[2 * (imageData.width * 4) + 100 * 4 + 2]) /
+			// 		3
+			// );
 			// Render the RGB histogram
 			//-------------------------------------------------------------------------------------------------
 			// renderRGBHistogram(pixels);
@@ -261,25 +272,31 @@ const VideoVectorScope = () => {
 			// Calculate the width of each waveform sample
 			const sampleWidth = canvas.width / pixels.length;
 
-			// Plot the waveform
-			for (let i = 0; i < pixels.length; i += 8) {
-				const red = pixels[i];
-				const green = pixels[i + 1];
-				const blue = pixels[i + 2];
+			// Analyze the pixels in the image from top-left to bottom-right by cols
+			let index = 0;
 
-				// Calculate the average value (brightness) of the pixel
-				const brightness = (red + green + blue) / 3;
+			for (let col = 0; col < 800; col += 2) {
+				for (let row = 449; row >= 0; row = row - 1) {
+					//0 red, 1 green, 2 blue, 3 alpha
+					const red = pixels[row * (800 * 4) + col * 4 + 0];
+					const green = pixels[row * (800 * 4) + col * 4 + 1];
+					const blue = pixels[row * (800 * 4) + col * 4 + 2];
 
-				// Calculate the vertical position for the waveform sample
-				const y = waveformHeight - (brightness * waveformHeight) / 255;
+					// Calculate the average value (brightness) of the pixel
+					const brightness = (red + green + blue) / 3;
 
-				// Draw the line for the waveform sample
-				context.beginPath();
-				context.lineWidth = 1;
-				context.moveTo(i * sampleWidth, y);
-				context.lineTo(i * sampleWidth, y + 0.26);
-				context.stroke();
-				context.strokeStyle = "green";
+					// Calculate the vertical position for the waveform sample
+					const y = waveformHeight - (brightness * waveformHeight) / 255;
+
+					// Draw the line for the waveform sample
+					context.beginPath();
+					context.moveTo(index * sampleWidth, y);
+					context.lineTo(index * sampleWidth, y + 0.6);
+					context.stroke();
+					context.strokeStyle = "green";
+
+					index = index + 8;
+				}
 			}
 		};
 
@@ -347,7 +364,8 @@ const VideoVectorScope = () => {
 				height={450}
 			/>
 			<div className="relative">
-				<div className="absolute h-full w-full z-30 py-[20px] flex flex-col justify-between">
+				<div className="absolute h-full w-full z-30 pl-[20px] py-[40px] flex flex-col justify-between">
+					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
 					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
 					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
 					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
@@ -359,11 +377,24 @@ const VideoVectorScope = () => {
 					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
 					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
 				</div>
+				<div className="absolute h-full w-full z-30 py-[30px] flex flex-col justify-between">
+					<h1 className="text-stone-800">100</h1>
+					<h1 className="text-stone-800">90</h1>
+					<h1 className="text-stone-800">80</h1>
+					<h1 className="text-stone-800">70</h1>
+					<h1 className="text-stone-800">60</h1>
+					<h1 className="text-stone-800">50</h1>
+					<h1 className="text-stone-800">40</h1>
+					<h1 className="text-stone-800">30</h1>
+					<h1 className="text-stone-800">20</h1>
+					<h1 className="text-stone-800">10</h1>
+					<h1 className="text-stone-800">0</h1>
+				</div>
 				<canvas
-					className="m-[20px] py-[20px] bg-black"
+					className="m-[30px] py-[20px] bg-black"
 					id="waveFormCanvas"
-					width={600}
-					height={600}
+					width={1000}
+					height={1000}
 				/>
 			</div>
 			{/* <canvas
