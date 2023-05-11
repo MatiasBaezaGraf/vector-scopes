@@ -324,27 +324,27 @@ const VideoVectorScope = () => {
 					src="flower.webm"
 					controls
 				/>
-				<div className=" flex-col justify-center hidden">
+				<div className=" flex-col justify-center">
 					<canvas
-						className="m-[10px] bg-stone-300 border-[1px] border-stone-500"
+						className="m-[10px] bg-[#222222] border-[1px] border-[#353535]"
 						id="grayscale"
 						width={512}
 						height={130}
 					/>
 					<canvas
-						className="m-[10px] bg-stone-300 border-[1px] border-stone-500"
+						className="m-[10px] bg-[#222222] border-[1px] border-[#353535]"
 						id="red"
 						width={512}
 						height={130}
 					/>
 					<canvas
-						className="m-[10px] bg-stone-300 border-[1px] border-stone-500"
+						className="m-[10px] bg-[#222222] border-[1px] border-[#353535]"
 						id="green"
 						width={512}
 						height={130}
 					/>
 					<canvas
-						className="m-[10px] bg-stone-300 border-[1px] border-stone-500"
+						className="m-[10px] bg-[#222222] border-[1px] border-[#353535]"
 						id="blue"
 						width={512}
 						height={130}
@@ -364,7 +364,7 @@ const VideoVectorScope = () => {
 				height={450}
 			/>
 			<div className="relative">
-				<div className="absolute h-full w-full z-30 pl-[20px] py-[40px] flex flex-col justify-between">
+				<div className="absolute h-full w-full z-30 px-[30px] py-[40px] flex flex-col justify-between">
 					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
 					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
 					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
@@ -377,7 +377,7 @@ const VideoVectorScope = () => {
 					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
 					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
 				</div>
-				<div className="absolute h-full w-full z-30 py-[30px] flex flex-col justify-between">
+				<div className="absolute h-full w-full z-30 p-[30px] flex flex-col justify-between">
 					<h1 className="text-stone-800">100</h1>
 					<h1 className="text-stone-800">90</h1>
 					<h1 className="text-stone-800">80</h1>
