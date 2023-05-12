@@ -9,40 +9,32 @@ const VideoVectorScope = () => {
 		const imageElement = imageRef.current;
 
 		const captureFrame = () => {
-			const canvas = document.getElementById("videoCanvas");
+			// const canvas = document.getElementById("videoCanvas");
+			const canvas = document.getElementById("photoCanvas");
 			const context = canvas.getContext("2d");
 
 			// Draw the current video frame onto the canvas
-			context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+			// context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+			context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
 			// Get the pixel data of the current frame
 			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 			const pixels = imageData.data;
 
-			//row 50, column 200, 0 red, 1 green, 2 blue, 3 alpha
-			console.log("red", pixels[100 * (imageData.width * 4) + 600 * 4 + 0]);
-			console.log("green", pixels[100 * (imageData.width * 4) + 600 * 4 + 1]);
-			console.log("blue", pixels[100 * (imageData.width * 4) + 600 * 4 + 2]);
-
-			// console.log(
-			// 	"brightness",
-			// 	(pixels[2 * (imageData.width * 4) + 100 * 4 + 0] +
-			// 		pixels[2 * (imageData.width * 4) + 100 * 4 + 1] +
-			// 		pixels[2 * (imageData.width * 4) + 100 * 4 + 2]) /
-			// 		3
-			// );
 			// Render the RGB histogram
 			//-------------------------------------------------------------------------------------------------
 			// renderRGBHistogram(pixels);
 
 			// Render the RGB histogram
 			//-------------------------------------------------------------------------------------------------
-			renderMultiRGBHistogram(pixels);
+			// renderMultiRGBHistogram(pixels);
 
 			// Render the Waveform
 			//-------------------------------------------------------------------------------------------------
-			renderWaveform(pixels);
+			// renderWaveform(pixels);
 
-			// Perform frame processing and vector scope calculations here
+			// Render the Vectorscope
+			//-------------------------------------------------------------------------------------------------
+			renderVectorscope(pixels);
 
 			// Request the next frame
 			requestAnimationFrame(captureFrame);
@@ -300,6 +292,62 @@ const VideoVectorScope = () => {
 			}
 		};
 
+		const renderVectorscope = (pixels) => {
+			const canvas = document.getElementById("vectorscopeCanvas");
+			const context = canvas.getContext("2d");
+			const canvasWidth = canvas.width;
+			const canvasHeight = canvas.height;
+
+			const centerX = canvasWidth / 2;
+			const centerY = canvasHeight / 2;
+
+			// Process the pixel data
+			for (let i = 0; i < pixels.length; i += 4) {
+				const red = pixels[i];
+				const green = pixels[i + 1];
+				const blue = pixels[i + 2];
+
+				// Convert RGB to HSL
+				const r = red / 255;
+				const g = green / 255;
+				const b = blue / 255;
+				const max = Math.max(r, g, b);
+				const min = Math.min(r, g, b);
+				let hue;
+
+				if (max === min) {
+					hue = 0; // achromatic (gray)
+				} else {
+					const delta = max - min;
+					if (max === r) {
+						hue = ((g - b) / delta) % 6;
+					} else if (max === g) {
+						hue = (b - r) / delta + 2;
+					} else {
+						hue = (r - g) / delta + 4;
+					}
+					hue = (hue * 60 + 360) % 360; // convert to degrees
+				}
+
+				// Map the hue to canvas dimensions
+				const angle = (hue / 360) * Math.PI * 2;
+				const radius = canvasWidth / 2 - 1;
+
+				// Calculate the point coordinates
+				const x = centerX + Math.cos(angle) * radius;
+				const y = centerY + Math.sin(angle) * radius;
+
+				// Plot the point on the vectorscope
+				context.beginPath();
+				context.moveTo(x, y);
+				context.lineTo(x, y + 1);
+				context.strokeStyle = "white";
+				context.stroke();
+			}
+
+			// const saturation = Math.sqrt(red * red + green * green + blue * blue);
+		};
+
 		captureFrame();
 
 		return () => {
@@ -312,19 +360,20 @@ const VideoVectorScope = () => {
 			<div className="flex flex-row items-center">
 				{/* Comment out the video tag and uncomment the image tag to see the
 				histogram and waveform for the image instead of the video and viceversa*/}
-				{/* <img
+				<img
 					className="p-[20px] h-min"
 					ref={imageRef}
 					src="gato.png"
 					alt="colors"
-				/> */}
-				<video
+				/>
+				{/* <video 
 					className="p-[20px] h-min"
 					ref={videoRef}
 					src="flower.webm"
 					controls
-				/>
-				<div className=" flex-col justify-center">
+				/> */}
+				{/* Histogram  */}
+				<div className="flex-col justify-center">
 					<canvas
 						className="m-[10px] bg-[#222222] border-[1px] border-[#353535]"
 						id="grayscale"
@@ -363,6 +412,7 @@ const VideoVectorScope = () => {
 				width={800}
 				height={450}
 			/>
+			{/* Waveform  */}
 			<div className="relative">
 				<div className="absolute h-full w-full z-30 px-[30px] py-[40px] flex flex-col justify-between">
 					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
@@ -378,25 +428,31 @@ const VideoVectorScope = () => {
 					<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
 				</div>
 				<div className="absolute h-full w-full z-30 p-[30px] flex flex-col justify-between">
-					<h1 className="text-stone-800">100</h1>
-					<h1 className="text-stone-800">90</h1>
-					<h1 className="text-stone-800">80</h1>
-					<h1 className="text-stone-800">70</h1>
-					<h1 className="text-stone-800">60</h1>
-					<h1 className="text-stone-800">50</h1>
-					<h1 className="text-stone-800">40</h1>
-					<h1 className="text-stone-800">30</h1>
-					<h1 className="text-stone-800">20</h1>
-					<h1 className="text-stone-800">10</h1>
-					<h1 className="text-stone-800">0</h1>
+					<h1 className="text-white text-[10px] -translate-x-[20px]">100</h1>
+					<h1 className="text-white text-[10px] -translate-x-[20px]">90</h1>
+					<h1 className="text-white text-[10px] -translate-x-[20px]">80</h1>
+					<h1 className="text-white text-[10px] -translate-x-[20px]">70</h1>
+					<h1 className="text-white text-[10px] -translate-x-[20px]">60</h1>
+					<h1 className="text-white text-[10px] -translate-x-[20px]">50</h1>
+					<h1 className="text-white text-[10px] -translate-x-[20px]">40</h1>
+					<h1 className="text-white text-[10px] -translate-x-[20px]">30</h1>
+					<h1 className="text-white text-[10px] -translate-x-[20px]">20</h1>
+					<h1 className="text-white text-[10px] -translate-x-[20px]">10</h1>
+					<h1 className="text-white text-[10px] -translate-x-[20px]">0</h1>
 				</div>
 				<canvas
-					className="m-[30px] py-[20px] bg-black"
+					className="m-[30px] py-[20px] bg-black border-[1px] border-[#353535]"
 					id="waveFormCanvas"
-					width={1000}
-					height={1000}
+					width={700}
+					height={700}
 				/>
 			</div>
+			<canvas
+				className="p-[20px] bg-black/20"
+				id="vectorscopeCanvas"
+				width={500}
+				height={500}
+			/>
 			{/* <canvas
 				className="p-[20px]"
 				id="histogramCanvas"
