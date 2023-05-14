@@ -22,8 +22,8 @@ const Hue = () => {
 
 		const angleInRadians = angle * (Math.PI / 180);
 
-		const endX = centerX + distance * Math.sin(angleInRadians);
-		const endY = centerY - distance * Math.cos(angleInRadians);
+		const endX = centerX + distance * 2.5 * Math.sin(angleInRadians);
+		const endY = centerY - distance * 2.5 * Math.cos(angleInRadians);
 
 		context.beginPath();
 		context.moveTo(centerX, centerY); // Starting point (center of the canvas)

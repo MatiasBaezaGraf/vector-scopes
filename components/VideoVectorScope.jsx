@@ -9,13 +9,13 @@ const VideoVectorScope = () => {
 		const imageElement = imageRef.current;
 
 		const captureFrame = () => {
-			// const canvas = document.getElementById("videoCanvas");
-			const canvas = document.getElementById("photoCanvas");
+			const canvas = document.getElementById("videoCanvas");
+			// const canvas = document.getElementById("photoCanvas");
 			const context = canvas.getContext("2d");
 
 			// Draw the current video frame onto the canvas
-			// context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-			context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+			context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+			// context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
 			// Get the pixel data of the current frame
 			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 			const pixels = imageData.data;
@@ -26,11 +26,11 @@ const VideoVectorScope = () => {
 
 			// Render the RGB histogram
 			//-------------------------------------------------------------------------------------------------
-			// renderMultiRGBHistogram(pixels);
+			renderMultiRGBHistogram(pixels);
 
 			// Render the Waveform
 			//-------------------------------------------------------------------------------------------------
-			// renderWaveform(pixels);
+			renderWaveform(pixels);
 
 			// Render the Vectorscope
 			//-------------------------------------------------------------------------------------------------
@@ -293,56 +293,64 @@ const VideoVectorScope = () => {
 		};
 
 		const renderVectorscope = (pixels) => {
-			const canvas = document.getElementById("vectorscopeCanvas");
+			const canvas = document.getElementById("colorWheelCanvas");
 			const context = canvas.getContext("2d");
-			const canvasWidth = canvas.width;
-			const canvasHeight = canvas.height;
+			const colorWheelImg = document.getElementById("colorWheelImg");
 
-			const centerX = canvasWidth / 2;
-			const centerY = canvasHeight / 2;
+			context.drawImage(colorWheelImg, 0, 0, 500, 500);
 
-			// Process the pixel data
-			for (let i = 0; i < pixels.length; i += 4) {
-				const red = pixels[i];
-				const green = pixels[i + 1];
-				const blue = pixels[i + 2];
+			// Analyze the pixels in the image from top-left to bottom-right by cols
+			for (let i = 0; i < pixels.length; i = i + 12) {
+				const r = pixels[i + 0];
+				const g = pixels[i + 1];
+				const b = pixels[i + 2];
 
-				// Convert RGB to HSL
-				const r = red / 255;
-				const g = green / 255;
-				const b = blue / 255;
-				const max = Math.max(r, g, b);
-				const min = Math.min(r, g, b);
+				// Calculate the hue
+				let red = r / 255;
+				let green = g / 255;
+				let blue = b / 255;
+
+				const max = Math.max(red, green, blue);
+				const min = Math.min(red, green, blue);
+
 				let hue;
 
 				if (max === min) {
 					hue = 0; // achromatic (gray)
 				} else {
 					const delta = max - min;
-					if (max === r) {
-						hue = ((g - b) / delta) % 6;
-					} else if (max === g) {
-						hue = (b - r) / delta + 2;
+					if (max === red) {
+						hue = ((green - blue) / delta) % 6;
+					} else if (max === green) {
+						hue = (blue - red) / delta + 2;
 					} else {
-						hue = (r - g) / delta + 4;
+						hue = (red - green) / delta + 4;
 					}
 					hue = (hue * 60 + 360) % 360; // convert to degrees
 				}
 
-				// Map the hue to canvas dimensions
-				const angle = (hue / 360) * Math.PI * 2;
-				const radius = canvasWidth / 2 - 1;
+				//Calculate the saturation
+				const saturation = (max === 0 ? 0 : (max - min) / max) * 100;
 
-				// Calculate the point coordinates
-				const x = centerX + Math.cos(angle) * radius;
-				const y = centerY + Math.sin(angle) * radius;
+				//Calculate the value
+				const value = max * 100;
 
-				// Plot the point on the vectorscope
+				//Get the canvas center
+				const centerX = canvas.width / 2;
+				const centerY = canvas.height / 2;
+
+				//Convert the polar coordinates to cartesian coordinates
+				const angleInRadians = hue * (Math.PI / 180);
+
+				const endX = centerX - saturation * 2 * Math.sin(angleInRadians);
+				const endY = centerY - saturation * 2 * Math.cos(angleInRadians);
+
 				context.beginPath();
-				context.moveTo(x, y);
-				context.lineTo(x, y + 1);
-				context.strokeStyle = "white";
-				context.stroke();
+				context.moveTo(endX, endY); // Starting point (center of the canvas)
+				context.lineTo(endX, endY + 0.06); // Endpoint calculated based on angle and distance
+				context.strokeStyle = "white"; // Set line color
+				context.lineWidth = 1; // Set line width
+				context.stroke(); // Draw the line
 			}
 
 			// const saturation = Math.sqrt(red * red + green * green + blue * blue);
@@ -360,18 +368,18 @@ const VideoVectorScope = () => {
 			<div className="flex flex-row items-center">
 				{/* Comment out the video tag and uncomment the image tag to see the
 				histogram and waveform for the image instead of the video and viceversa*/}
-				<img
+				{/* <img
 					className="p-[20px] h-min"
 					ref={imageRef}
-					src="gato.png"
+					src="guy3.png"
 					alt="colors"
-				/>
-				{/* <video 
+				/> */}
+				<video
 					className="p-[20px] h-min"
 					ref={videoRef}
-					src="flower.webm"
+					src="colores.mp4"
 					controls
-				/> */}
+				/>
 				{/* Histogram  */}
 				<div className="flex-col justify-center">
 					<canvas
@@ -447,11 +455,17 @@ const VideoVectorScope = () => {
 					height={700}
 				/>
 			</div>
+			<img
+				id="colorWheelImg"
+				src="VectorScope.png"
+				alt="color wheel"
+				className="w-[500px] h-[500px] hidden"
+			/>
 			<canvas
-				className="p-[20px] bg-black/20"
-				id="vectorscopeCanvas"
-				width={500}
-				height={500}
+				id="colorWheelCanvas"
+				width="500"
+				height="500"
+				className="transform rotate-[-14deg]"
 			/>
 			{/* <canvas
 				className="p-[20px]"
