@@ -377,7 +377,7 @@ const VideoVectorScope = () => {
 				<video
 					className="p-[20px] h-min"
 					ref={videoRef}
-					src="colores.mp4"
+					src="colors.mp4"
 					controls
 				/>
 				{/* Histogram  */}
